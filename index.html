@@ -62,7 +62,17 @@
             });
 
             socket.on('message', function(data) {
-                $('#chat').append('<div><b>' + data.username + ':</b> ' + data.msg + '</div>');
+                if (data.username && data.msg) {
+                    $('#chat').append('<div><b>' + data.username + ':</b> ' + data.msg + '</div>');
+                }
+            });
+
+            socket.on('connect', function() {
+                console.log('Connected to the server.');
+            });
+
+            socket.on('disconnect', function() {
+                console.log('Disconnected from the server.');
             });
         });
     </script>
