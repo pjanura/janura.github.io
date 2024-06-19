@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Chat Application</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
+    <style>
+        #chat {
+            height: 300px;
+            overflow-y: scroll;
+            border: 1px solid #ccc;
+            margin-bottom: 10px;
+            padding: 10px;
+        }
+        #chat div {
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Chat Application</h1>
+    <div>
+        <input type="text" id="username" placeholder="Enter username">
+        <button id="join">Join Chat</button>
+    </div>
+    <div id="chat"></div>
+    <div>
+        <input type="text" id="message" placeholder="Enter message">
+        <button id="send">Send</button>
+        <button id="leave">Leave Chat</button>
+    </div>
+
+    <script>
+        $(document).ready(function(){
+            var socket = io();
+            var room = "default";
+            var username = "";
+
+            $('#join').click(function() {
+                username = $('#username').val();
+                if (username) {
+                    socket.emit('join', {'username': username, 'room': room});
+                    $('#chat').append('<div><b>' + username + ' joined the chat.</b></div>');
+                }
+            });
+
+            $('#send').click(function() {
+                var message = $('#message').val();
+                if (message && username) {
+                    socket.emit('message', {'msg': message, 'username': username, 'room': room});
+                    $('#message').val('');
+                }
+            });
+
+            $('#leave').click(function() {
+                if (username) {
+                    socket.emit('leave', {'username': username, 'room': room});
+                    $('#chat').append('<div><b>' + username + ' left the chat.</b></div>');
+                    username = "";
+                }
+            });
+
+            socket.on('message', function(data) {
+                $('#chat').append('<div><b>' + data.username + ':</b> ' + data.msg + '</div>');
+            });
+        });
+    </script>
+</body>
+</html>
